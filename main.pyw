@@ -1,11 +1,11 @@
 import tkinter as tk
 from tkinter import messagebox
 from PIL import ImageGrab
+from win10toast import ToastNotifier
 import io
 import win32clipboard
 import requests
-import tempfile
-import webbrowser
+import tempfile, webbrowser
 
 class ScreenshotApp:
     def __init__(self, root):
@@ -128,6 +128,14 @@ class ScreenshotApp:
             win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
             win32clipboard.CloseClipboard()
             
+            toaster = ToastNotifier()
+            toaster.show_toast(
+                "Screenshot Captured",
+                "Screnshot has been copied to clipboard! Uploading to Google Lens...",
+                duration=5,
+                threaded=False
+            )
+
             litter = self.catbox(screenshot)
             if litter is not None:
                 webbrowser.open(f'https://lens.google.com/uploadbyurl?url={litter}')
