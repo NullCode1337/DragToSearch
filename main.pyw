@@ -70,7 +70,7 @@ class ScreenshotApp:
             self.rect, self.start_x, self.start_y,
             self.current_x, self.current_y)
 
-    def on_release(self):
+    def on_release(self, event):
         self.capture_region()
         self.root.destroy()
 
