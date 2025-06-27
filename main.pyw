@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from PIL import ImageGrab
-from win10toast import ToastNotifier
+from plyer import notification
 import io
 import win32clipboard
 import requests
@@ -128,12 +128,10 @@ class ScreenshotApp:
             win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
             win32clipboard.CloseClipboard()
             
-            toaster = ToastNotifier()
-            toaster.show_toast(
-                "Screenshot Captured",
-                "Screnshot has been copied to clipboard! Uploading to Google Lens...",
-                duration=5,
-                threaded=False
+            notification.notify(
+                title="Screenshot Captured!",
+                message="Screnshot has been copied to clipboard! Uploading to Google Lens...",
+                timeout=5
             )
 
             litter = self.catbox(screenshot)
