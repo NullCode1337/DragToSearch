@@ -35,7 +35,7 @@ class ScreenshotApp:
 
         self.label = tk.Label(root, text="Click and drag to select region (Press ESC to cancel)", 
                             bg='black', fg='white', font=('Arial', 16))
-        self.label.place(relx=0.5, rely=0.1, anchor=tk.CENTER)
+        self.label.place(relx=0.5, rely=0.8, anchor=tk.CENTER)
         
         self.root.withdraw()
         self.root.update()
