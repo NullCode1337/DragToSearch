@@ -75,6 +75,8 @@ class ScreenshotApp:
 
     def on_release(self, event):
         if self.dragging:
+            self.root.withdraw()
+            self.root.update()
             self.capture_region()
         self.root.destroy()
 
@@ -114,9 +116,7 @@ class ScreenshotApp:
             screen_x2 = x2 + self.root.winfo_x()
             screen_y2 = y2 + self.root.winfo_y()
             
-            self.root.withdraw()
             screenshot = ImageGrab.grab(bbox=(screen_x1, screen_y1, screen_x2, screen_y2))
-            self.root.deiconify()
             
             output = io.BytesIO()
             screenshot.convert("RGB").save(output, format="BMP")
