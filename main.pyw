@@ -12,7 +12,7 @@ class ScreenshotApp:
     def __init__(self, root):
         self.root = root
         self.root.overrideredirect(True)
-        self.root.attributes('-alpha', 0.15)
+        self.root.attributes('-alpha', 0.1)
         self.root.attributes('-topmost', True)
         
         screen_size = f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}+0+0"
@@ -49,26 +49,25 @@ class ScreenshotApp:
     def animate_gradient(self):
         width = self.root.winfo_screenwidth()
         height = self.root.winfo_screenheight()
-        segment_height = 5
         
         for item in self.gradient_items:
             self.canvas.delete(item)
         self.gradient_items = []
         
-        for y in range(0, height, segment_height):
-            r = int((math.sin(self.phase + y * 0.005) * 127 + 128))
-            g = int((math.sin(self.phase + y * 0.005 + 2) * 127 + 128))
-            b = int((math.sin(self.phase + y * 0.005 + 4) * 127 + 128))
+        for y in range(0, height, 2):
+            ratio = y / height
+            r = 255
+            g = int(255 * ratio)
+            b = 0
             color = f"#{r:02x}{g:02x}{b:02x}"
             
             rect = self.canvas.create_rectangle(
-                0, y, width, y + segment_height,
+                0, y, width, y + 2, 
                 fill=color, outline='', tags="gradient")
             self.gradient_items.append(rect)
-            self.canvas.lower(rect)
         
-        self.phase += 0.02
-        self.root.after(30, self.animate_gradient)
+        for rect in self.gradient_items:
+            self.canvas.lower(rect)
 
     def on_press(self, event):
         self.start_x = event.x
