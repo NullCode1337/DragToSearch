@@ -23,6 +23,7 @@ class ScreenshotApp:
         self.start_y = None
         self.current_x = None
         self.current_y = None
+        self.dragging = False 
 
         self.canvas = tk.Canvas(root, cursor="cross", bg='black', highlightthickness=0)
         self.canvas.pack(fill=tk.BOTH, expand=True)
@@ -55,9 +56,13 @@ class ScreenshotApp:
         
         self.canvas.create_image(0, 0, image=self.gradient_img, anchor=tk.NW, tags="gradient")
 
+    def on_click(self, event):
+        self.root.destroy()
+
     def on_press(self, event):
         self.start_x = event.x
         self.start_y = event.y
+        self.dragging = False
         self.rect = self.canvas.create_rectangle(
             self.start_x, self.start_y, 
             self.start_x, self.start_y,
@@ -65,13 +70,15 @@ class ScreenshotApp:
         self.canvas.tag_raise(self.rect)
 
     def on_drag(self, event):
+        self.dragging = True
         self.current_x, self.current_y = (event.x, event.y)
         self.canvas.coords(
             self.rect, self.start_x, self.start_y,
             self.current_x, self.current_y)
 
     def on_release(self, event):
-        self.capture_region()
+        if self.dragging:
+            self.capture_region()
         self.root.destroy()
 
     def catbox(self, image):
