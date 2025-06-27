@@ -12,7 +12,7 @@ class ScreenshotApp:
     def __init__(self, root):
         self.root = root
         self.root.overrideredirect(True)
-        self.root.attributes('-alpha', 0.3)
+        self.root.attributes('-alpha', 0.15)
         self.root.attributes('-topmost', True)
         
         screen_size = f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}+0+0"
