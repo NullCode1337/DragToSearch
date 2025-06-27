@@ -56,9 +56,6 @@ class ScreenshotApp:
         
         self.canvas.create_image(0, 0, image=self.gradient_img, anchor=tk.NW, tags="gradient")
 
-    def on_click(self, event):
-        self.root.destroy()
-
     def on_press(self, event):
         self.start_x = event.x
         self.start_y = event.y
