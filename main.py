@@ -6,14 +6,13 @@ import win32clipboard
 import requests
 import tempfile
 import webbrowser
+import math
 
 class ScreenshotApp:
     def __init__(self, root):
         self.root = root
-
         self.root.overrideredirect(True)
         self.root.attributes('-alpha', 0.3)
-        self.root.configure(bg='white')
         self.root.attributes('-topmost', True)
         
         screen_size = f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}+0+0"
@@ -25,23 +24,51 @@ class ScreenshotApp:
         self.start_y = None
         self.current_x = None
         self.current_y = None
-        
+
         self.rect = None
-        self.canvas = tk.Canvas(root, cursor="cross", bg='gray')
+        self.canvas = tk.Canvas(root, cursor="cross", bg='black', highlightthickness=0)
         self.canvas.pack(fill=tk.BOTH, expand=True)
         
         self.canvas.bind("<ButtonPress-1>", self.on_press)
         self.canvas.bind("<B1-Motion>", self.on_drag)
         self.canvas.bind("<ButtonRelease-1>", self.on_release)
-        
+
         self.label = tk.Label(root, text="Click and drag to select region (Press ESC to cancel)", 
-                            bg='white', fg='white', font=('Arial', 16))
+                            bg='black', fg='white', font=('Arial', 16))
         self.label.place(relx=0.5, rely=0.1, anchor=tk.CENTER)
         
         self.root.withdraw()
         self.root.update()
         self.reference_screenshot = ImageGrab.grab()
         self.root.deiconify()
+        
+        self.phase = 0
+        self.gradient_items = []
+        self.animate_gradient()
+
+    def animate_gradient(self):
+        width = self.root.winfo_screenwidth()
+        height = self.root.winfo_screenheight()
+        segment_height = 5
+        
+        for item in self.gradient_items:
+            self.canvas.delete(item)
+        self.gradient_items = []
+        
+        for y in range(0, height, segment_height):
+            r = int((math.sin(self.phase + y * 0.005) * 127 + 128))
+            g = int((math.sin(self.phase + y * 0.005 + 2) * 127 + 128))
+            b = int((math.sin(self.phase + y * 0.005 + 4) * 127 + 128))
+            color = f"#{r:02x}{g:02x}{b:02x}"
+            
+            rect = self.canvas.create_rectangle(
+                0, y, width, y + segment_height,
+                fill=color, outline='', tags="gradient")
+            self.gradient_items.append(rect)
+            self.canvas.lower(rect)
+        
+        self.phase += 0.02
+        self.root.after(30, self.animate_gradient)
 
     def on_press(self, event):
         self.start_x = event.x
@@ -50,6 +77,7 @@ class ScreenshotApp:
             self.start_x, self.start_y, 
             self.start_x, self.start_y,
             outline='red', width=2, fill='white')
+        self.canvas.tag_raise(self.rect)
 
     def on_drag(self, event):
         self.current_x, self.current_y = (event.x, event.y)
@@ -115,7 +143,7 @@ class ScreenshotApp:
             if litter is not None:
                 webbrowser.open(f'https://lens.google.com/uploadbyurl?url={litter}')
             else:
-                messagebox.showerror("Error", "Upload failed - paste the image here")
+                messagebox.showerror("Error", "Upload failed - paste the image in Google Lens later :)")
                 webbrowser.open('https://lens.google.com')
         else:
             raise SystemExit(1)
