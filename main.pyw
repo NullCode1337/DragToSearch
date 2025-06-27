@@ -6,7 +6,6 @@ import win32clipboard
 import requests
 import tempfile
 import webbrowser
-import math
 
 class ScreenshotApp:
     def __init__(self, root):
@@ -25,7 +24,6 @@ class ScreenshotApp:
         self.current_x = None
         self.current_y = None
 
-        self.rect = None
         self.canvas = tk.Canvas(root, cursor="cross", bg='black', highlightthickness=0)
         self.canvas.pack(fill=tk.BOTH, expand=True)
         
@@ -33,6 +31,8 @@ class ScreenshotApp:
         self.canvas.bind("<B1-Motion>", self.on_drag)
         self.canvas.bind("<ButtonRelease-1>", self.on_release)
 
+        self.create_static_gradient()
+        
         self.label = tk.Label(root, text="Click and drag to select region (Press ESC to cancel)", 
                             bg='black', fg='white', font=('Arial', 16))
         self.label.place(relx=0.5, rely=0.8, anchor=tk.CENTER)
@@ -41,33 +41,19 @@ class ScreenshotApp:
         self.root.update()
         self.reference_screenshot = ImageGrab.grab()
         self.root.deiconify()
-        
-        self.phase = 0
-        self.gradient_items = []
-        self.animate_gradient()
 
-    def animate_gradient(self):
+    def create_static_gradient(self):
         width = self.root.winfo_screenwidth()
         height = self.root.winfo_screenheight()
         
-        for item in self.gradient_items:
-            self.canvas.delete(item)
-        self.gradient_items = []
+        self.gradient_img = tk.PhotoImage(width=width, height=height)
         
-        for y in range(0, height, 2):
-            ratio = y / height
-            r = 255
-            g = int(255 * ratio)
-            b = 0
-            color = f"#{r:02x}{g:02x}{b:02x}"
-            
-            rect = self.canvas.create_rectangle(
-                0, y, width, y + 2, 
-                fill=color, outline='', tags="gradient")
-            self.gradient_items.append(rect)
+        for y in range(height):
+            g = int(255 * (y / height))
+            color = f"#ff{g:02x}00"
+            self.gradient_img.put(color, (0, y, width, y+1))
         
-        for rect in self.gradient_items:
-            self.canvas.lower(rect)
+        self.canvas.create_image(0, 0, image=self.gradient_img, anchor=tk.NW, tags="gradient")
 
     def on_press(self, event):
         self.start_x = event.x
@@ -84,7 +70,7 @@ class ScreenshotApp:
             self.rect, self.start_x, self.start_y,
             self.current_x, self.current_y)
 
-    def on_release(self, event):
+    def on_release(self):
         self.capture_region()
         self.root.destroy()
 
